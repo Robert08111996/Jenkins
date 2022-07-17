@@ -1,0 +1,4 @@
+1.sudo chown 1000:1000 jenkins_home -R
+2.Password can be found in /var/jenkins_home/secrets/initialAdminPassword
+3.docker-compose stop, docker-compose start, docker-compose restart jenkins, docker-compose down
+4.Jenkins URL:http://3.110.119.43:8080/

@@ -1,0 +1,21 @@
+1.echo "Hello world"
+2.echo "current date and time is $(date)"
+Name=Robert
+3.echo "Hi $Name, current date and time is $(date)"
+4.
+#!bin/bash
+
+Name=$1
+Lastname=$2
+SHOW=$3
+if [ "$SHOW" = "true"]; then
+  echo "Hello $Name $Lastname"
+else 
+  echo "if u want show the name please select show option"
+ fi
+ 
+ 
+ 
+To copy a file from local to container use the following command
+
+docker cp "file name" "container name":"container path"

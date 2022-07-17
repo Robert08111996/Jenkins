@@ -1,0 +1,5 @@
+1.We can clone git to our local by using Git username and access tokens.
+2. After a month the access token will get expire, so need to clone again, follow the below steps
+git clone https://Robert081996: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@github.com/Robert081996/maven.git
+3. After cloning try to pull and push..
+'''

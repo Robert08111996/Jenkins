@@ -1,0 +1,16 @@
+http://192.168.0.105:8080/job/maven/16/console
+
+curl -v -X GET http://192.168.0.105:8080/crumbIssuer/api/json --user jenkins:1234
+
+http://192.168.0.105:8080/configureSecurity/
+
+"9322ec1dc055af7e38f399c40a486ecf6446faaa0a6aa5d250e244112f2648fc"
+
+curl -X POST http://192.168.0.105:8080/job/ENV/build?delay=0sec/ --user jenkins:1234 -H 'Jenkins-Crumb: 9322ec1dc055af7e38f399c40a486ecf6446faaa0a6aa5d250e244112f2648fc'
+
+
+To trigger files automatically using crumb make the following changes
+cd /var/opt/gitlab/git-data/repositories/jenkins/maven.git
+
+then create one directory called custom_hooks
+then create a file post-receive

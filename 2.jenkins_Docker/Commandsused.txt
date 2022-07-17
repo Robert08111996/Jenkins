@@ -1,0 +1,4 @@
+Commands Used for SSH:
+1.crete a ssh key using ssh-keygen -f remote-key
+2.Afterthat copy that key to the jenkins container.
+ docker cp remote-key jenkins:/tmp/remote-key

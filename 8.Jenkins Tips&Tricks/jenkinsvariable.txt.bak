@@ -1,0 +1,7 @@
+echo "BUILD NUMBER is $BUILD_NUMBER"
+echo "BUILD ID is $BUILD_ID"
+echo "BUILD URL is $BUILD_URL"
+echo "job name is $JOB_NAME"
+
+2.Our environment variables can be created..
+Go to manage jenkins-->configure system-->Global Properties-->Environment variables

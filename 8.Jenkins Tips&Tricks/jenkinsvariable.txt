@@ -1,0 +1,14 @@
+echo "BUILD NUMBER is $BUILD_NUMBER"
+echo "BUILD ID is $BUILD_ID"
+echo "BUILD URL is $BUILD_URL"
+echo "job name is $JOB_NAME"
+
+2.Our environment variables can be created..
+Go to manage jenkins-->configure system-->Global Properties-->Environment variables
+
+3.Jenkins URL can be changed by refering the above path.
+
+4.we can build a specific job periodically by using cron job.
+ * * * * * -This will build every single minute.
+ 50 17 * * * - This will build at 5.50 pm everyday
+ 30 17 15 6 * - This will build 15th day of 6th month at 5.30.

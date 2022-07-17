@@ -1,0 +1,6 @@
+1.we need to install a plugin called Role based strategy plugin.
+2.we can create an user by going to manage jenkins, manage users.The created user will not have anything,we need to assign the permission to that.
+3.we need to create an role, and assign some permission to that.
+
+4. we can restrict user to view only specific users.we can use manage and assign roles. In roles we have project role there we need to specify the particular project alone,
+by giving name-.* . Eg: Ansible-.*

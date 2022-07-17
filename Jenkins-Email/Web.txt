@@ -1,0 +1,2 @@
+1.SMTP gmail server
+1.Gmail less secure apps

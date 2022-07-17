@@ -1,0 +1,8 @@
+To trigger the build automatically use below steps
+1.Go to /var/opt/gitlab/git-data/repositories/"repo.git"
+2.Create a folder like custom_hooks
+3.create a file like post-receive
+4.Add the post-receive script
+
+
+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

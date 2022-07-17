@@ -1,0 +1,171 @@
+1.Need to install docker inside the jenkins container.
+
+2.Jenkins is Debian os.
+  cat /etc/os-release
+3.we can install docker inside the docker container, by attaching the volume inside the docker-compose.yaml file.Then we can run docker commands inside the container.
+4.Create a jar for Maven app using docker.
+     1.First create a maven image of version 3 by using following command
+	    docker pull maven:3-alpine
+	 2.Then attach a volume to the maven container by running following command
+        docker run -ti -v /home/jenkins/jenkinshome/pipeline/java-app:/app maven:3-alpine sh
+     3.Then try to build a jar using command "mvn package"
+     4.Copy the root/.m2 files to the local by using following command
+       	 docker run --rm -ti -v /home/jenkins/jenkinshome/pipeline/java-app:/app -v /root/.m2:/root/.m2 -w /app maven:3-alpine sh
+     5.Run the container without going inside of that container
+	     docker run --rm  -v /home/jenkins/jenkinshome/pipeline/java-app:/app -v /root/.m2:/root/.m2 -w /app maven:3-alpine mvn -B -DskipTests clean install -Denforcer.skip=true
+		 docker run --rm  -v /home/jenkins/jenkinshome/pipeline/java-app:/app -v /root/.m2:/root/.m2 -w /app maven:3-alpine mvn -B -DskipTests clean package
+5.Create a Bash script to automate job creation
+  #!/bin/bash
+
+echo "***************************"
+echo "** Building jar ***********"
+echo "***************************"
+
+
+
+docker run --rm  -v /home/jenkins/jenkinshome/pipeline/java-app:/app -v /root/.m2:/root/.m2 -w /app maven:3-alpine "$@"
+
+
+  1.The last line "$@" indicates we need to send a maven commands there like (mvn -B -DskipTests clean install -Denforcer.skip=true)
+  
+6.Create a dockerfile and build a image with the jar.
+  1.Create a docker file using the following lines
+    
+    FROM openjdk:8-jre-alpine
+
+	RUN mkdir /app
+
+	COPY *.jar /app/app.jar
+
+	CMD java -jar /app/app.jar	
+	
+
+7.Automate the image build process using docker-compose file.
+
+version: '3'
+services:
+  app:
+    image: "maven-project:$BUILD_TAG"
+    build:
+      context: .
+      dockerfile: Dockerfile-Java
+
+then run the following command
+ 	 docker-compose -f docker-compose-build.yml build
+
+
+8.Write bash script for docker image creation process
+
+#!/bin/bash
+
+# Copy the new jar to the build location
+cp -f java-app/target/*.jar jenkins/build/
+
+echo "****************************"
+echo "** Building Docker Image ***"
+echo "****************************"
+
+cd jenkins/build/ && docker-compose -f docker-compose-build.yml build --no-cache
+
+9.Create a remote machine using AWS or virtual box and make sure whether we can ssh into that machine
+
+"ssh-key -f prod"
+the above command will generate 2 key file public key file private key file. we need to copy that public file alone to new machine like 
+ 1.create a new user
+ 2.make a new directory like .ssh and give permission as 700
+ 3.create a new file like authorized_keys and copy the public file content there and change the mode as 400
+ 4.Now we can ssh with the private file
+
+
+10.Create a docker hub account
+ try to push our docker image to the docker hub account
+11. Create a bash file to push it
+
+#!/bin/bash
+
+echo "********************"
+echo "** Pushing image ***"
+echo "********************"
+
+IMAGE="maven-project"
+
+echo "** Logging in ***"
+docker login -u robert081996 -p $PASS
+echo "*** Tagging image ***"
+docker tag $IMAGE:$BUILD_TAG robert081996/$IMAGE:$BUILD_TAG
+echo "*** Pushing image ***"
+docker push robert081996/$IMAGE:$BUILD_TAG
+ 
+
+
+12.Transfer some variable to remote machine
+we need to transfer our  required variable to the client machine
+
+13. Create a docker-compose file in client machine
+
+version: '3'
+services:
+  maven:
+    image: "robert081996/$IMAGE:$TAG"
+    container_name: Robert
+
+14. Create a bash file to deploy and publish
+#!/bin/bash
+
+echo maven-project > /tmp/.auth
+echo $BUILD_TAG >> /tmp/.auth
+echo $PASS >> /tmp/.auth
+
+scp -i /opt/prod /tmp/.auth robert@3.111.246.5:/tmp/.auth
+scp -i /opt/prod ./jenkins/deploy/publish.sh robert@3.111.246.5:/tmp/publish.sh
+ssh -i /opt/prod robert@3.111.246.5 "/tmp/publish.sh"
+
+
+
+#!/bin/bash
+
+export IMAGE=$(sed -n '1p' /tmp/.auth)
+export TAG=$(sed -n '2p' /tmp/.auth)
+export PASS=$(sed -n '3p' /tmp/.auth)
+
+docker login -u robert081996 -p $PASS
+cd ~/maven && docker-compose up -d
+
+15. Need to copy ssh file into jenkins container in the correct path.
+
+10.Important one
+
+Create a GIT repositary to store our code and scripts for the app
+ steps to follow in local machine
+ 1.git init
+ 2.cat ../dsl-jobs/.git/config
+ 3.https://github.com/Robert081996/pipeline-maven
+   git remote add origin https://Robert081996:Robby#081996@github.com/Robert081996/pipeline-maven.git
+   Authentication will fail use below command as token
+   git remote add origin https://Robert081996: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@github.com/Robert081996/pipeline-maven.git
+   git remote add origin https://Robert08111996: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@github.com/Robert08111996/cicd.git
+ 4.  
+ 
+ 
+ Github Has Revoked the support for password authentication on 13 Aug 2021 and giving the below mentioned response:
+
+Support for password authentication was removed on August 13, 2021
+In order to fix the issue follow the below steps:
+
+1.Goto settings of Github account
+2.Find and Select Developer Settings
+3.Find and Select Personal access tokens
+4.Generate a new token
+5.Fill in any note and select the access scopes
+6.once done click on generate token
+7.Use the generated token in place of a password to communicate with GitHub.
+
+
+
+when you got push error do the following.
+
+when you create your access token
+In expiration: it should say No expiration.
+In selecte scopes you mark the repo radio button.
+As shown in the image below
+
